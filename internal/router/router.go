@@ -1,7 +1,7 @@
 package routes
 
 import (
-	"github.com/dwiputrarf/codelabs-backend-fiber/internal/handlers"
+	"github.com/dwiputrarf/codelabs-backend-fiber/internal/handler"
 	"github.com/gofiber/fiber/v2"
 )
 
