@@ -33,14 +33,14 @@ func LoadConfig() {
     }
 
     AppConfig = &Config{
-        AppName:    getEnv("APP_NAME", "MyApp"),
+        AppName:    getEnv("APP_NAME", "codelabs-api"),
         Port:       getEnv("PORT", "3000"),
         Env:        getEnv("ENV", "development"),
         DBHost:     getEnv("DB_HOST", "localhost"),
         DBPort:     dbPort,
-        DBUser:     getEnv("DB_USER", "postgres"),
-        DBPassword: getEnv("DB_PASSWORD", ""),
-        DBName:     getEnv("DB_NAME", "mydb"),
+        DBUser:     getEnv("DB_USER", "go_user"),
+        DBPassword: getEnv("DB_PASSWORD", "secret"),
+        DBName:     getEnv("DB_NAME", "codelabs_fiber"),
     }
 }
 

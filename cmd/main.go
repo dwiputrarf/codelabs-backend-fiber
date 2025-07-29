@@ -3,8 +3,8 @@ package main
 import (
 	"log"
 
-	"github.com/dwiputrarf/codelabs-backend-fiber/config"
-	"github.com/dwiputrarf/codelabs-backend-fiber/internal/router"
+	"codelabs-backend-fiber/config"
+	"codelabs-backend-fiber/internal/router"
 	"github.com/gofiber/fiber/v2"
 )
 

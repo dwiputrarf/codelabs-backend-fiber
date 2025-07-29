@@ -5,7 +5,7 @@ import (
 	"log"
 	"os"
 
-	"github.com/dwiputrarf/codelabs-backend-fiber/internal/model"
+	"codelabs-backend-fiber/internal/model"
 	"github.com/joho/godotenv"
 	"gorm.io/driver/postgres"
 	"gorm.io/gorm"

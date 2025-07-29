@@ -1,4 +1,4 @@
-module github.com/dwiputrarf/codelabs-backend-fiber
+module codelabs-backend-fiber
 
 go 1.24.5
 
