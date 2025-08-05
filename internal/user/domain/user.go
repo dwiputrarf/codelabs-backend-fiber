@@ -27,6 +27,7 @@ type User struct {
 type UserRepository interface {
 	FindAll() ([]User, error)
 	FindByID(id uint) (*User, error)
+	FindByEmail(email string) (*User, error)
 	Create(user *User) error
 }
 
@@ -34,4 +35,5 @@ type UserUsecase interface {
 	GetAll() ([]User, error)
 	GetByID(id uint) (*User, error)
 	Create(user *User) error
+	Login(email, password string) (*User, error)
 }

@@ -3,6 +3,7 @@ package usecase
 import (
 	"codelabs-backend-fiber/internal/user/domain"
 	"codelabs-backend-fiber/pkg/security"
+	"fmt"
 )
 
 type userUsecase struct {
@@ -33,4 +34,17 @@ func (u *userUsecase) Create(user *domain.User) error {
     }
 	
 	return u.repo.Create(user)
+}
+
+func (u *userUsecase) Login(email, password string) (*domain.User, error) {
+    user, err := u.repo.FindByEmail(email)
+    if err != nil {
+        return nil, fmt.Errorf("invalid email or password")
+    }
+
+    if !security.CheckPasswordHash(password, user.Password) {
+        return nil, fmt.Errorf("invalid email or password")
+    }
+
+    return user, nil
 }

@@ -5,6 +5,7 @@ import (
 	"codelabs-backend-fiber/internal/user/dto"
 	customError "codelabs-backend-fiber/pkg/error"
 	"codelabs-backend-fiber/pkg/response"
+	"codelabs-backend-fiber/pkg/utils"
 	"codelabs-backend-fiber/pkg/validator"
 	"errors"
 	"fmt"
@@ -69,4 +70,25 @@ func (h *UserHandler) Create(c *fiber.Ctx) error {
 	}
 
 	return response.Success(c, fiber.StatusCreated, "User created", map[string]any{})
+}
+
+func (h *UserHandler) Login(c *fiber.Ctx) error {
+	var req dto.LoginRequest
+	if err := c.BodyParser(&req); err != nil {
+		return response.Error(c, fiber.StatusBadRequest, "Invalid request")
+	}
+
+	user, err := h.usecase.Login(req.Email, req.Password)
+	if err != nil {
+		return response.Error(c, fiber.StatusUnauthorized, "Invalid email or password")
+	}
+
+	token, err := utils.GenerateJWT(user.ID, user.Email, string(user.Role))
+	if err != nil {
+		return response.Error(c, fiber.StatusInternalServerError, "Failed to generate token")
+	}
+
+	return response.Success(c, fiber.StatusOK, "Login success", fiber.Map{
+		"token": token,
+	})
 }

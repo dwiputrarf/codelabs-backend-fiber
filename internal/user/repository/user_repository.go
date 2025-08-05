@@ -38,3 +38,11 @@ func (r *userRepo) Create(user *domain.User) error {
 	}
 	return nil
 }
+
+func (r *userRepo) FindByEmail(email string) (*domain.User, error) {
+    var user domain.User
+    if err := r.db.Where("email = ?", email).First(&user).Error; err != nil {
+        return nil, err
+    }
+    return &user, nil
+}

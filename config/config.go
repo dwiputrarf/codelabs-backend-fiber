@@ -18,6 +18,7 @@ type Config struct {
 	DBUser string
 	DBPass string
 	DBName string
+	JWT_SECRET string
 }
 
 var AppConfig *Config
@@ -41,6 +42,7 @@ func LoadConfig() {
 		DBUser:     getEnv("DB_USER", "go_user"),
 		DBPass:     getEnv("DB_PASS", "secret"),
 		DBName:     getEnv("DB_NAME", "codelabs_fiber"),
+		JWT_SECRET: getEnv("JWT_SECRET", ""),
 	}
 }
 

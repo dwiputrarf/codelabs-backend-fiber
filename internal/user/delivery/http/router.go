@@ -18,5 +18,5 @@ func RegisterRoutes(app *fiber.App, uc domain.UserUsecase) {
     
     // Auth routes
     api.Post("/register", handler.Create)
-	// api.Post("/login", handler.Login)
+	api.Post("/login", handler.Login)
 }
