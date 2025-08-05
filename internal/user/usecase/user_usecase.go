@@ -1,6 +1,9 @@
 package usecase
 
-import "codelabs-backend-fiber/internal/user/domain"
+import (
+	"codelabs-backend-fiber/internal/user/domain"
+	"codelabs-backend-fiber/pkg/security"
+)
 
 type userUsecase struct {
 	repo domain.UserRepository
@@ -19,5 +22,15 @@ func (u *userUsecase) GetByID(id uint) (*domain.User, error) {
 }
 
 func (u *userUsecase) Create(user *domain.User) error {
+	hashed, err := security.HashPassword(user.Password)
+    if err != nil {
+        return err
+    }
+    user.Password = hashed
+
+    if user.Role == "" {
+        user.Role = "user"
+    }
+	
 	return u.repo.Create(user)
 }
