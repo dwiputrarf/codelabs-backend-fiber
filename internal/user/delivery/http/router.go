@@ -6,6 +6,17 @@ import (
 )
 
 func RegisterRoutes(app *fiber.App, uc domain.UserUsecase) {
+	handler := NewUserHandler(uc)
+
 	api := app.Group("/api")
-	NewUserHandler(api, uc)
+	users := api.Group("/users")
+
+	// User routes
+    users.Get("/", handler.GetAll)
+    users.Get("/:id", handler.GetByID)
+    users.Post("/", handler.Create)
+    
+    // Auth routes
+    api.Post("/register", handler.Create)
+	// api.Post("/login", handler.Login)
 }

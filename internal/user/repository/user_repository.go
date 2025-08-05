@@ -2,6 +2,8 @@ package repository
 
 import (
 	"codelabs-backend-fiber/internal/user/domain"
+	customError "codelabs-backend-fiber/pkg/error"
+	"strings"
 
 	"gorm.io/gorm"
 )
@@ -27,5 +29,12 @@ func (r *userRepo) FindByID(id uint) (*domain.User, error) {
 }
 
 func (r *userRepo) Create(user *domain.User) error {
-	return r.db.Create(user).Error
+	err := r.db.Create(user).Error
+	if err != nil {
+		if strings.Contains(err.Error(), "idx_users_email") {
+			return customError.ErrEmailAlreadyExists
+		}
+		return err
+	}
+	return nil
 }

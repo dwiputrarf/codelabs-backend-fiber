@@ -2,60 +2,71 @@ package http
 
 import (
 	"codelabs-backend-fiber/internal/user/domain"
-	"github.com/gofiber/fiber/v2"
+	"codelabs-backend-fiber/internal/user/dto"
+	customError "codelabs-backend-fiber/pkg/error"
+	"codelabs-backend-fiber/pkg/response"
+	"codelabs-backend-fiber/pkg/validator"
+	"errors"
+	"fmt"
 	"strconv"
+
+	"github.com/gofiber/fiber/v2"
 )
 
 type UserHandler struct {
 	usecase domain.UserUsecase
 }
 
-func NewUserHandler(router fiber.Router, uc domain.UserUsecase) {
-	handler := &UserHandler{uc}
-	router.Get("/users", handler.GetAll)
-	router.Get("/users/:id", handler.GetByID)
-	router.Post("/users", handler.Create)
+func NewUserHandler(uc domain.UserUsecase) *UserHandler {
+	return &UserHandler{
+		usecase: uc,
+	}
 }
 
 func (h *UserHandler) GetAll(c *fiber.Ctx) error {
 	users, err := h.usecase.GetAll()
 	if err != nil {
-		return c.Status(500).JSON(fiber.Map{"error": err.Error()})
+		return response.Error(c, fiber.StatusInternalServerError, err.Error())
 	}
-	return c.JSON(users)
+	return response.Success(c, fiber.StatusOK, "Get List Users Success", users)
 }
 
 func (h *UserHandler) GetByID(c *fiber.Ctx) error {
 	id, _ := strconv.Atoi(c.Params("id"))
 	user, err := h.usecase.GetByID(uint(id))
 	if err != nil {
-		return c.Status(404).JSON(fiber.Map{"error": "User not found"})
+		return response.Error(c, fiber.StatusNotFound, "User not found")
 	}
-	return c.JSON(user)
+	return response.Success(c, fiber.StatusOK, "Success Get Detail User", user)
 }
 
 func (h *UserHandler) Create(c *fiber.Ctx) error {
-	var req CreateUserRequest
+	var req dto.CreateUserRequest
+
 	if err := c.BodyParser(&req); err != nil {
-		return c.Status(400).JSON(fiber.Map{"error": err.Error()})
+		return response.Error(c, fiber.StatusBadRequest, "invalid request")
+	}
+
+	if errors := validator.ValidateStruct(req); errors != nil {
+		return response.Error(c, fiber.StatusBadRequest, fmt.Sprintf("validation_errors: %v", errors))
 	}
 
 	user := &domain.User{
 		FullName: req.FullName,
 		Email:    req.Email,
-		Password: req.Password, // You should hash this!
+		Password: req.Password,
+		Role:     domain.Role(req.Role),
 	}
 
 	err := h.usecase.Create(user)
 	if err != nil {
-		return c.Status(500).JSON(fiber.Map{"error": err.Error()})
+		switch {
+		case errors.Is(err, customError.ErrEmailAlreadyExists):
+			return response.Error(c, fiber.StatusBadRequest, "email already exists")
+		default:
+			return response.Error(c, fiber.StatusInternalServerError, "Internal Server Error")
+		}
 	}
 
-	resp := UserResponse{
-		ID:       user.ID,
-		FullName: user.FullName,
-		Email:    user.Email,
-	}
-
-	return c.Status(201).JSON(resp)
+	return response.Success(c, fiber.StatusCreated, "User created", map[string]any{})
 }

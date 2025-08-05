@@ -29,7 +29,7 @@ func (u *userUsecase) Create(user *domain.User) error {
     user.Password = hashed
 
     if user.Role == "" {
-        user.Role = "user"
+        user.Role = domain.RoleUser
     }
 	
 	return u.repo.Create(user)

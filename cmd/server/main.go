@@ -4,9 +4,9 @@ import (
 	"codelabs-backend-fiber/config"
 	"codelabs-backend-fiber/infrastructure/postgres"
 	"codelabs-backend-fiber/internal/user/delivery/http"
-	"codelabs-backend-fiber/internal/user/domain"
 	"codelabs-backend-fiber/internal/user/repository"
 	"codelabs-backend-fiber/internal/user/usecase"
+	database "codelabs-backend-fiber/migrations"
 	"fmt"
 
 	"github.com/gofiber/fiber/v2"
@@ -29,14 +29,18 @@ func main() {
 
 	db := postgres.NewGormDB(dsn)
 
-	// AutoMigrate User model
-	db.AutoMigrate(&domain.User{})
+	// AutoMigrate Database
+	database.Migrate(db)
 
+	// Init Module
 	userRepo := repository.NewUserRepository(db)
 	userUsecase := usecase.NewUserUsecase(userRepo)
 
 	app := fiber.New()
+
+	// Register Routes
 	http.RegisterRoutes(app, userUsecase)
 
+	// Started the apps
 	app.Listen(":" + cfg.Port)
 }
